@@ -41,7 +41,7 @@ extension CMQuaternion: Equatable {
         )
     }
 
-    var inverse: CMQuaternion {
+    var conjugated: CMQuaternion {
         return CMQuaternion(x: -x, y: -y, z: -z, w: w)
     }
 
@@ -66,7 +66,7 @@ extension CMQuaternion: Equatable {
 
     static func * (a: CMQuaternion, b: SCNVector3) -> SCNVector3 {
         let p = CMQuaternion(x: b.x, y: b.y, z: b.z, w: 0)
-        let q = a * p * a.inverse
+        let q = a * p * a.conjugated
         return SCNVector3(q.x, q.y, q.z)
     }
 }

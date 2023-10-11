@@ -11,6 +11,7 @@ import SwiftUI
 
 class AppState: ObservableObject {
     @Published var quaternion = CMQuaternion()
+    @Published var correctedQuaternion = CMQuaternion()
     @Published var scene = HeadScene()
 
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
@@ -23,11 +24,12 @@ class AppState: ObservableObject {
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
             quaternion = self.headphoneMotionDetector.quaternion
-            scene.setQuaternion(q: self.quaternion)
+            correctedQuaternion = self.headphoneMotionDetector.correctedQuaternion
+            scene.setQuaternion(q: self.correctedQuaternion)
 
             quaternionUpdate.send()
 
-            oscSender.setQuaternion(q: quaternion)
+            oscSender.setQuaternion(q: correctedQuaternion)
         }
 
         headphoneMotionDetector.start()

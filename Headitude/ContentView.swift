@@ -57,6 +57,25 @@ struct ContentView: View {
                             Text("Roll:")
                             Text(String(format: "%.2f", roll))
                         }
+                        
+                        Button(action: {
+                            appState.headphoneMotionDetector.resetOrientation()
+                                }) {
+                                    Text("reset")
+                                }
+                        
+                        Button(action: {
+                            appState.headphoneMotionDetector.startCalibration()
+                                }) {
+                                    Text("Start")
+                                }
+                              
+                        Button(action: {
+                            appState.headphoneMotionDetector.finishCalibration()
+                                }) {
+                                    Text("end")
+                                }
+                                
                     }.frame(minWidth: 120)
                 }
 
