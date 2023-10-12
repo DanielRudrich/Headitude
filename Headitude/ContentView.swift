@@ -57,6 +57,15 @@ struct ContentView: View {
                             Text("Roll:")
                             Text(String(format: "%.2f", roll))
                         }
+
+                        Button(action: {
+                            appState.headphoneMotionDetector.calibration.resetOrientation()
+                        }) {
+                            Text("Reset Orientation")
+                        }
+
+                        PressedReleaseButton(buttonText: "Press, Nod, Release", onDown: { appState.headphoneMotionDetector.calibration.start() }, onRelease: { appState.headphoneMotionDetector.calibration.finish() })
+
                     }.frame(minWidth: 120)
                 }
 
@@ -70,6 +79,10 @@ struct ContentView: View {
             yaw = taitBryan.yaw
             pitch = taitBryan.pitch
             roll = taitBryan.roll
+        }
+        .onDisappear {
+            // I don't think that's the right place to store the settings, but it works for now.
+            appState.oscSender.storeSettings()
         }
     }
 }
@@ -98,5 +111,33 @@ struct AccessInfo: View {
                     .fontWeight(.bold)
             }
         }.padding().background(.red.opacity(0.2)).cornerRadius(5)
+    }
+}
+
+struct PressedReleaseButton: View {
+    @GestureState private var pressed = false
+    @State private var pressing = false
+
+    let buttonText: String
+    var onDown: () -> Void
+    var onRelease: () -> Void
+
+    var body: some View {
+        Text(buttonText)
+            .padding(4)
+            .background(self.pressing ? Color.red : Color.blue)
+            .cornerRadius(6)
+
+            .gesture(DragGesture(minimumDistance: 0.0)
+                .onChanged { _ in
+                    if !self.pressing {
+                        self.pressing = true
+                        onDown()
+                    }
+                }
+                .onEnded { _ in
+                    self.pressing = false
+                    onRelease()
+                })
     }
 }

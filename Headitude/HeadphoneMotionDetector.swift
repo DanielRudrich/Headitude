@@ -8,29 +8,35 @@
 import Cocoa
 import CoreMotion
 import Foundation
+import SwiftUI
 
 class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionManagerDelegate {
     private let headphoneMotionManager = CMHeadphoneMotionManager()
-
     private var timer = Timer()
     private var updateInterval: TimeInterval
 
-    @Published var quaternion: CMQuaternion = .init()
+    // raw orientation data
+    @Published var data: CMDeviceMotion = .init()
+
+    // corrected quaternion
+    @Published var correctedQuaternion: CMQuaternion = .init()
 
     @Published var connected: Bool = false
 
-    var onUpdate: (() -> Void) = {}
-    var onConnectionStatusChanged: ((_ isConnected: Bool) -> Void) = { _ in }
-
-    static func isAuthorized() -> Bool {
-        return CMHeadphoneMotionManager.authorizationStatus() == CMAuthorizationStatus.authorized
-    }
+    var calibration = Calibration()
 
     init(updateInterval: TimeInterval) {
         self.updateInterval = updateInterval
         super.init()
 
         headphoneMotionManager.delegate = self
+    }
+
+    var onUpdate: (() -> Void) = {}
+    var onConnectionStatusChanged: ((_ isConnected: Bool) -> Void) = { _ in }
+
+    static func isAuthorized() -> Bool {
+        return CMHeadphoneMotionManager.authorizationStatus() == CMAuthorizationStatus.authorized
     }
 
     func start() {
@@ -66,7 +72,9 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
 
     func updateMotionData() {
         if let data = headphoneMotionManager.deviceMotion {
-            quaternion = data.attitude.quaternion
+            self.data = data
+            calibration.update(data: data)
+            correctedQuaternion = calibration.apply(to: data.attitude.quaternion)
             onUpdate()
         }
     }

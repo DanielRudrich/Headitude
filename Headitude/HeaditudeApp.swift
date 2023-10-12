@@ -11,7 +11,10 @@ import SwiftUI
 
 class AppState: ObservableObject {
     @Published var quaternion = CMQuaternion()
+    @Published var correctedQuaternion = CMQuaternion()
     @Published var scene = HeadScene()
+
+    @AppStorage("ContentView.selectedProduct") private var calibration: Data = .init()
 
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
@@ -22,12 +25,13 @@ class AppState: ObservableObject {
 
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
-            quaternion = self.headphoneMotionDetector.quaternion
-            scene.setQuaternion(q: self.quaternion)
+            quaternion = self.headphoneMotionDetector.data.attitude.quaternion
+            correctedQuaternion = self.headphoneMotionDetector.correctedQuaternion
+            scene.setQuaternion(q: self.correctedQuaternion)
 
             quaternionUpdate.send()
 
-            oscSender.setQuaternion(q: quaternion)
+            oscSender.setQuaternion(q: correctedQuaternion)
         }
 
         headphoneMotionDetector.start()
@@ -48,12 +52,10 @@ struct HeaditudeApp: App {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationDidFinishLaunching(_: Notification) {
-        // Initialize any setup here if needed
-    }
+    func applicationDidFinishLaunching(_: Notification) {}
 
     func applicationWillTerminate(_: Notification) {
-        // Handle app termination here
+        // userDefaults.set(appState.calibration, forKey: "SavedAppStateKey")
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {

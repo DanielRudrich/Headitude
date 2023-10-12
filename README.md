@@ -6,7 +6,26 @@ AirPods Orientation to OSC Sender
 Starting with macOS Sonoma 14.0 it is possible to access the orientation data of Apple AirPods using the CoreMotion framework.
 The **Headitude** app reads the orientation data and forwards it via OSC to a specified IP address and port.
 
-**:warning: Note**: The app is in an early stage of development and might not provide peak user experience just yet.
+**:warning: Note**: The app is in an early stage of development and might not provide peak user experience just yet. It's
+my first Swift/SwiftUI app, so don't expect best practices. :wink: But please let me know if you have any suggestions!! :pray:
+
+### Calibration
+The app doesn't know how you wear your AirPods. Therefore you need to calibrate the orientation data. Luckily,
+my calibration routine is very quick, and can be done in a fraction of a second (if you're fast enough).
+
+While you are wearing your AirPods:
+- look forward
+- press and hold the `Press, Nod, Release` button
+- nod your head down
+- while looking down, release the button
+- :tada: you're done!
+
+Internally, it uses the gravity data and some quaternion magic to calculate the calibration data. :sparkles:
+
+You can do a soft reset to reset the front direction by pressing the `Reset Orientation` button.
+
+The calibration data is stored in the user defaults and will be loaded on the next start of the app.
+:floppy_disk:
 
 ### Custom OSC Message
 
@@ -31,8 +50,11 @@ Currently the following tokens are supported:
 - `pitch+` Pitch-angle in degrees [0, 360]
 - `roll` Roll-angle in degrees
 - `roll+` Roll-angle in degrees [0, 360]
+- `qw` Quaternion w
+- `qx` Quaternion x
+- `qy` Quaternion y
+- `qz` Quaternion z
 
-You can prepend a token with a `-` to flip the sign.
+**Note**: You can prepend a token with a `-` to flip the sign.
 
-There are more tokens to come, e.g. angles in radians and quaternions.
-
+There are more tokens to come, e.g. angles in radians...
