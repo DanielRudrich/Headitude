@@ -35,10 +35,6 @@ class Calibration {
         restoreCalibration()
     }
 
-    deinit {
-        storeCalibration()
-    }
-
     func update(data: CMDeviceMotion) {
         self.data = data
     }

@@ -9,15 +9,40 @@ import CoreMotion
 import OSCKit
 import SwiftUI
 
-class OSCSender: ObservableObject {
+struct OSCStorageType: Codable {
+    var ip: String
+    var port: UInt16
+    var oscProtocol: String
+}
+
+class OSCSender {
     private var client = OSCClient()
 
     private var quaternion: CMQuaternion = .init()
+
+    @AppStorage("oscSettings") var oscSettingsStore: Data = .init()
 
     @Published var oscProtocol = "/SceneRotator/ypr yaw pitch roll"
     @Published var ip = "localhost"
     @Published var port: UInt16 = 3001
     @Published var protocolValid = true
+
+    init() {
+        restoreSettings()
+    }
+
+    func restoreSettings() {
+        guard let decoded = try? JSONDecoder().decode(OSCStorageType.self, from: oscSettingsStore) else { return }
+        oscProtocol = decoded.oscProtocol
+        ip = decoded.ip
+        port = decoded.port
+    }
+
+    func storeSettings() {
+        let oscSettingsData = OSCStorageType(ip: ip, port: port, oscProtocol: oscProtocol)
+        guard let data = try? JSONEncoder().encode(oscSettingsData) else { return }
+        oscSettingsStore = data
+    }
 
     func setQuaternion(q: CMQuaternion) {
         quaternion = q.toAmbisonicCoordinateSystem()
@@ -58,6 +83,16 @@ class OSCSender: ObservableObject {
             case "roll+":
                 value = Float(taitBryan.roll * 180 / Double.pi)
                 if value < 0 { value += 360 }
+
+            case "qw":
+                value = Float(quaternion.w)
+            case "qx":
+                value = Float(quaternion.x)
+            case "qy":
+                value = Float(quaternion.y)
+            case "qz":
+                value = Float(quaternion.z)
+
             default:
                 protocolValid = false
                 return
@@ -75,8 +110,6 @@ class OSCSender: ObservableObject {
             print("failed osc")
         }
     }
-
-    init() {}
 }
 
 struct OSCSenderView: View {

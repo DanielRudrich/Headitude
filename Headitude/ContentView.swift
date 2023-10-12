@@ -80,6 +80,10 @@ struct ContentView: View {
             pitch = taitBryan.pitch
             roll = taitBryan.roll
         }
+        .onDisappear {
+            // I don't think that's the right place to store the settings, but it works for now.
+            appState.oscSender.storeSettings()
+        }
     }
 }
 
