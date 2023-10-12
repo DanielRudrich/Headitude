@@ -8,48 +8,28 @@
 import Cocoa
 import CoreMotion
 import Foundation
+import SwiftUI
 
 class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionManagerDelegate {
     private let headphoneMotionManager = CMHeadphoneMotionManager()
-
     private var timer = Timer()
     private var updateInterval: TimeInterval
 
+    // raw orientation data
     @Published var data: CMDeviceMotion = .init()
-    @Published var quaternion: CMQuaternion = .init()
+
+    // corrected quaternion
     @Published var correctedQuaternion: CMQuaternion = .init()
+
     @Published var connected: Bool = false
 
-    // calibration
-    private var idleGravity: CMAcceleration = .init()
-    private var idleQuaternion: CMQuaternion = CMQuaternion(x:0, y:0, z: 0, w: 1)
-    private var idleQuaternionConjugated: CMQuaternion = CMQuaternion(x:0, y:0, z: 0, w: 1)
-    private var calibration: CMQuaternion = CMQuaternion(x:0, y:0, z: 0, w: 1)
+    var calibration = Calibration()
 
-    func correctQuaternion() {
-        let steering = idleQuaternionConjugated * quaternion
-        correctedQuaternion = calibration.conjugated * steering * calibration
-    }
+    init(updateInterval: TimeInterval) {
+        self.updateInterval = updateInterval
+        super.init()
 
-    func resetOrientation() {
-        idleQuaternionConjugated = quaternion.conjugated
-    }
-
-    func startCalibration() {
-        idleGravity = data.gravity.copy()
-        resetOrientation()
-    }
-
-    func finishCalibration() {
-        // compute Rudrich'sche look-and-nod calibration
-        let z = idleGravity.scaled(-1).normalized()
-        let x = data.gravity.crossProduct(idleGravity.scaled(-1)).normalized()
-        let y = z.crossProduct(x).normalized()
-
-        let w = 0.5 * sqrt(1.0 + x.x + y.y + z.z)
-        let f = 1 / (4 * w)
-
-        calibration = CMQuaternion(x: f * (y.z - z.y), y: f * (z.x - x.z), z: f * (x.y - y.x), w: w)
+        headphoneMotionManager.delegate = self
     }
 
     var onUpdate: (() -> Void) = {}
@@ -57,13 +37,6 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
 
     static func isAuthorized() -> Bool {
         return CMHeadphoneMotionManager.authorizationStatus() == CMAuthorizationStatus.authorized
-    }
-
-    init(updateInterval: TimeInterval) {
-        self.updateInterval = updateInterval
-        super.init()
-
-        headphoneMotionManager.delegate = self
     }
 
     func start() {
@@ -100,8 +73,8 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
     func updateMotionData() {
         if let data = headphoneMotionManager.deviceMotion {
             self.data = data
-            quaternion = data.attitude.quaternion
-            correctQuaternion()
+            calibration.update(data: data)
+            correctedQuaternion = calibration.apply(to: data.attitude.quaternion)
             onUpdate()
         }
     }
