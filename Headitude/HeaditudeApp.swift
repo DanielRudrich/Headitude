@@ -14,7 +14,7 @@ class AppState: ObservableObject {
     @Published var correctedQuaternion = CMQuaternion()
     @Published var scene = HeadScene()
 
-    @AppStorage("ContentView.selectedProduct") private var calibration: Data = .init()
+    @AppStorage("AppState.calibration") private var calibration: Data = .init()
 
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
