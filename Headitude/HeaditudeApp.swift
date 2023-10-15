@@ -16,6 +16,7 @@ class AppState: ObservableObject {
 
     @AppStorage("AppState.calibration") private var calibration: Data = .init()
 
+    private var accessCheckTimer = Timer()
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
     var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.01)
@@ -35,6 +36,18 @@ class AppState: ObservableObject {
         }
 
         headphoneMotionDetector.start()
+
+        // repeatedly check if access has been granted by the user
+        if !HeadphoneMotionDetector.isAuthorized() {
+            if HeadphoneMotionDetector.authorizationStatus == CMAuthorizationStatus.notDetermined {
+                accessCheckTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    self.accessAuthorized = HeadphoneMotionDetector.isAuthorized()
+                    if HeadphoneMotionDetector.authorizationStatus != CMAuthorizationStatus.notDetermined {
+                        self.accessCheckTimer.invalidate()
+                    }
+                }
+            }
+        }
     }
 }
 
