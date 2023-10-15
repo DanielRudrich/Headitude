@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var roll = 0.0
     @Binding var connected: Bool
 
+    @State private var mirrored = false
+
     var body: some View {
         VStack {
             Text("Headitude")
@@ -27,13 +29,15 @@ struct ContentView: View {
                 .padding()
 
             if !appState.accessAuthorized {
-                AccessInfo()
+                AccessInfo().padding()
             } else {
                 HStack {
                     VStack(spacing: 0) {
                         RotationViewer(scene: $appState.scene).frame(width: 180, height: 120)
-                        Button("Toggle Mirrored") {
+                        Text(mirrored ? "Mirrored" : "Normal view").font(.footnote)
+                        Button("Toggle View") {
                             appState.scene.toggleMirrored()
+                            self.mirrored = appState.scene.mirrored
                         }
                     }
 
@@ -110,7 +114,7 @@ struct AccessInfo: View {
                 Text("Open Settings")
                     .fontWeight(.bold)
             }
-        }.padding().background(.red.opacity(0.2)).cornerRadius(5)
+        }.padding().background(.red.opacity(0.2)).cornerRadius(5).frame(maxWidth: 400).padding()
     }
 }
 

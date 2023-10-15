@@ -13,6 +13,8 @@ class HeadScene: SCNScene {
     private let headGroup = SCNNode()
     private let mirror = SCNNode()
 
+    var mirrored = false
+
     func setQuaternion(q: CMQuaternion) {
         headGroup.rotation.w = q.angle
         let axis = q.axis
@@ -23,6 +25,7 @@ class HeadScene: SCNScene {
 
     func toggleMirrored() {
         mirror.scale.z *= -1
+        mirrored = mirror.scale.z < 0
     }
 
     override init() {
