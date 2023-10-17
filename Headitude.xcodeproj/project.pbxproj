@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F155B1032AD48A6900795E77 /* AccelerationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F155B1022AD48A6900795E77 /* AccelerationExtension.swift */; };
 		F155B1052AD8754400795E77 /* Calibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F155B1042AD8754400795E77 /* Calibration.swift */; };
+		F1758B1D2AE3F62A0048E80A /* ConnectionCalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */; };
 		F1A92ED22AD08D0B001C2315 /* HeaditudeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */; };
 		F1A92ED42AD08D0B001C2315 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A92ED32AD08D0B001C2315 /* ContentView.swift */; };
 		F1A92ED62AD08D0C001C2315 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1A92ED52AD08D0C001C2315 /* Assets.xcassets */; };
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		F155B1022AD48A6900795E77 /* AccelerationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerationExtension.swift; sourceTree = "<group>"; };
 		F155B1042AD8754400795E77 /* Calibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calibration.swift; sourceTree = "<group>"; };
+		F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionCalibrationView.swift; sourceTree = "<group>"; };
 		F1A92ECE2AD08D0B001C2315 /* Headitude.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Headitude.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaditudeApp.swift; sourceTree = "<group>"; };
 		F1A92ED32AD08D0B001C2315 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 		F1A92ED02AD08D0B001C2315 /* Headitude */ = {
 			isa = PBXGroup;
 			children = (
+				F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */,
 				F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */,
 				F1A92EF22AD2B644001C2315 /* HeadScene.swift */,
 				F1A92EE02AD08FB6001C2315 /* HeadphoneMotionDetector.swift */,
@@ -184,6 +187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1A92EEF2AD1A5AA001C2315 /* QuaternionExtension.swift in Sources */,
+				F1758B1D2AE3F62A0048E80A /* ConnectionCalibrationView.swift in Sources */,
 				F1A92ED42AD08D0B001C2315 /* ContentView.swift in Sources */,
 				F1A92EF12AD2A6C4001C2315 /* OSCSender.swift in Sources */,
 				F1A92EF32AD2B644001C2315 /* HeadScene.swift in Sources */,

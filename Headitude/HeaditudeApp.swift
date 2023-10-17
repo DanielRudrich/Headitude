@@ -19,18 +19,14 @@ class AppState: ObservableObject {
     private var accessCheckTimer = Timer()
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
-    var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.01)
+    var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.02)
     var oscSender = OSCSender()
-
-    let quaternionUpdate = PassthroughSubject<Void, Never>()
 
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
             quaternion = self.headphoneMotionDetector.data.attitude.quaternion
             correctedQuaternion = self.headphoneMotionDetector.correctedQuaternion
             scene.setQuaternion(q: self.correctedQuaternion)
-
-            quaternionUpdate.send()
 
             oscSender.setQuaternion(q: correctedQuaternion)
         }
@@ -59,7 +55,7 @@ struct HeaditudeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(connected: $appState.headphoneMotionDetector.connected).fixedSize().environmentObject(appState)
+            ContentView().fixedSize().environmentObject(appState).preferredColorScheme(.dark)
         }.windowResizability(.contentSize)
     }
 }

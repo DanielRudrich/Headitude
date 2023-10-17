@@ -121,8 +121,8 @@ struct OSCSenderView: View {
     @State private var isMessagePopoverVisible = false
 
     var body: some View {
-        VStack(spacing: 7) {
-            Text("OSC Settings ").font(.title2)
+        VStack(alignment: .leading, spacing: 10) {
+            Text("OSC Settings ").font(.system(size: 20, weight: .light)).foregroundStyle(Color(hex: 0xACACAC))
             HStack {
                 HStack {
                     Text("Host / IP")
@@ -181,8 +181,9 @@ struct OSCSenderView: View {
             }
         }
         .padding(10)
-        .background(.white.opacity(0.02)).cornerRadius(8)
+        .background(Color(hex: 0x252525)).cornerRadius(8)
         .padding()
+        .shadow(radius: 10)
     }
 }
 
