@@ -13,6 +13,8 @@ class HeadScene: SCNScene {
     private let headGroup = SCNNode()
     private let mirror = SCNNode()
 
+    var mirrored = false
+
     func setQuaternion(q: CMQuaternion) {
         headGroup.rotation.w = q.angle
         let axis = q.axis
@@ -23,6 +25,7 @@ class HeadScene: SCNScene {
 
     func toggleMirrored() {
         mirror.scale.z *= -1
+        mirrored = mirror.scale.z < 0
     }
 
     override init() {
@@ -30,11 +33,10 @@ class HeadScene: SCNScene {
 
         // create head
         let head = SCNNode()
-        let headGeometry = SCNCapsule(capRadius: 1, height: 2.5)
+        let headGeometry = SCNSphere(radius: 1)
         head.geometry = headGeometry
-        headGeometry.firstMaterial?.diffuse.contents = NSColor(
-            calibratedRed: 1, green: 1, blue: 1, alpha: 0.4
-        )
+        headGeometry.firstMaterial?.diffuse.contents = NSImage(resource: .gradient)
+        headGeometry.firstMaterial?.transparency = 0.8
         head.position = SCNVector3(x: 0, y: 0, z: 0)
 
         // left eye
@@ -105,8 +107,49 @@ class HeadScene: SCNScene {
         // set the position of the light node
         lightNode.position = SCNVector3(x: 0, y: 5, z: 5)
 
+        let lightNode2 = SCNNode()
+        // create a new light object
+        let light2 = SCNLight()
+        light2.type = .omni
+        // set the light's color to white
+        light2.color = NSColor.white
+        lightNode2.light = light
+        // set the position of the light node
+        lightNode2.position = SCNVector3(x: 3, y: -5, z: 10)
+
+        let ring = SCNNode()
+        let ringGeometry = SCNTorus(ringRadius: 1.2, pipeRadius: 0.02)
+        ring.geometry = ringGeometry
+        ringGeometry.firstMaterial?.diffuse.contents = NSColor(
+            calibratedRed: 1, green: 1, blue: 1, alpha: 0.5
+        )
+        ringGeometry.firstMaterial?.emission.contents = NSColor(.white)
+
+        let ring2 = SCNNode()
+        let ringGeometry2 = SCNTorus(ringRadius: 1.2, pipeRadius: 0.02)
+        ring2.geometry = ringGeometry2
+        ringGeometry2.firstMaterial?.diffuse.contents = NSColor(
+            calibratedRed: 1, green: 1, blue: 1, alpha: 0.5
+        )
+        ringGeometry2.firstMaterial?.emission.contents = NSColor(.white)
+        ring2.rotation = SCNVector4(x: 0, y: 0, z: 1, w: 3.14 / 2)
+
+        let ring3 = SCNNode()
+        let ringGeometry3 = SCNTorus(ringRadius: 1.2, pipeRadius: 0.02)
+        ring3.geometry = ringGeometry3
+        ringGeometry3.firstMaterial?.diffuse.contents = NSColor(
+            calibratedRed: 1, green: 1, blue: 1, alpha: 0.5
+        )
+        ringGeometry3.firstMaterial?.emission.contents = NSColor(.white)
+        ring3.rotation = SCNVector4(x: 1, y: 0, z: 0, w: 3.14 / 2)
+
+        headGroup.addChildNode(ring)
+        headGroup.addChildNode(ring2)
+        headGroup.addChildNode(ring3)
+
         // add the light node to the scene
         rootNode.addChildNode(lightNode)
+        rootNode.addChildNode(lightNode2)
         headGroup.addChildNode(head)
         headGroup.addChildNode(leftEye)
         headGroup.addChildNode(rightEye)
@@ -130,6 +173,8 @@ class HeadScene: SCNScene {
         // Set camera to look at the origin
         let constraint = SCNLookAtConstraint(target: rootNode)
         cameraNode.constraints = [constraint]
+
+        toggleMirrored()
     }
 
     @available(*, unavailable)

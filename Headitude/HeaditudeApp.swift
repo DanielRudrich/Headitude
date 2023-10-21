@@ -14,14 +14,13 @@ class AppState: ObservableObject {
     @Published var correctedQuaternion = CMQuaternion()
     @Published var scene = HeadScene()
 
-    @AppStorage("ContentView.selectedProduct") private var calibration: Data = .init()
+    @AppStorage("AppState.calibration") private var calibration: Data = .init()
 
+    private var accessCheckTimer = Timer()
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
-    var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.01)
+    var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.02)
     var oscSender = OSCSender()
-
-    let quaternionUpdate = PassthroughSubject<Void, Never>()
 
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
@@ -29,12 +28,22 @@ class AppState: ObservableObject {
             correctedQuaternion = self.headphoneMotionDetector.correctedQuaternion
             scene.setQuaternion(q: self.correctedQuaternion)
 
-            quaternionUpdate.send()
-
             oscSender.setQuaternion(q: correctedQuaternion)
         }
 
         headphoneMotionDetector.start()
+
+        // repeatedly check if access has been granted by the user
+        if !HeadphoneMotionDetector.isAuthorized() {
+            if HeadphoneMotionDetector.authorizationStatus == CMAuthorizationStatus.notDetermined {
+                accessCheckTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    self.accessAuthorized = HeadphoneMotionDetector.isAuthorized()
+                    if HeadphoneMotionDetector.authorizationStatus != CMAuthorizationStatus.notDetermined {
+                        self.accessCheckTimer.invalidate()
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -46,7 +55,7 @@ struct HeaditudeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(connected: $appState.headphoneMotionDetector.connected).fixedSize().environmentObject(appState)
+            ContentView().fixedSize().environmentObject(appState).preferredColorScheme(.dark)
         }.windowResizability(.contentSize)
     }
 }

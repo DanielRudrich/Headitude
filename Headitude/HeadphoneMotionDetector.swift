@@ -35,6 +35,10 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
     var onUpdate: (() -> Void) = {}
     var onConnectionStatusChanged: ((_ isConnected: Bool) -> Void) = { _ in }
 
+    static var authorizationStatus: CMAuthorizationStatus {
+        return CMHeadphoneMotionManager.authorizationStatus()
+    }
+
     static func isAuthorized() -> Bool {
         return CMHeadphoneMotionManager.authorizationStatus() == CMAuthorizationStatus.authorized
     }

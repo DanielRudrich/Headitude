@@ -13,82 +13,40 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var appState: AppState
 
-    @State private var yaw = 0.0
-    @State private var pitch = 0.0
-    @State private var roll = 0.0
-    @Binding var connected: Bool
-
     var body: some View {
-        VStack {
-            Text("Headitude")
-                .font(.largeTitle)
-                .fontWeight(.heavy)
-                .foregroundColor(.blue)
-                .padding()
+        VStack(alignment: .leading) {
+            HStack(spacing: 4) {
+                Image(.logo)
+                    .shadow(radius: 10)
+                Text("Headitude")
+                    .font(.system(size: 30))
+                    .fontWeight(.light)
+                    .foregroundColor(.white)
+            }
 
             if !appState.accessAuthorized {
-                AccessInfo()
+                AccessInfo().padding()
             } else {
                 HStack {
-                    VStack(spacing: 0) {
-                        RotationViewer(scene: $appState.scene).frame(width: 180, height: 120)
-                        Button("Toggle Mirrored") {
-                            appState.scene.toggleMirrored()
-                        }
-                    }
+                    RotationViewerGroup().frame(width: 200)
 
-                    VStack {
-                        Text(connected ? "Connected" : "Not Connected")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(connected ? Color.green : Color.red)
-
-                        HStack {
-                            Text("Yaw:")
-                            Text(String(format: "%.2f", yaw))
-                        }
-
-                        HStack {
-                            Text("Pitch:")
-                            Text(String(format: "%.2f", pitch))
-                        }
-
-                        HStack {
-                            Text("Roll:")
-                            Text(String(format: "%.2f", roll))
-                        }
-
-                        Button(action: {
-                            appState.headphoneMotionDetector.calibration.resetOrientation()
-                        }) {
-                            Text("Reset Orientation")
-                        }
-
-                        PressedReleaseButton(buttonText: "Press, Nod, Release", onDown: { appState.headphoneMotionDetector.calibration.start() }, onRelease: { appState.headphoneMotionDetector.calibration.finish() })
-
-                    }.frame(minWidth: 120)
+                    ConnectionCalibrationView(connected: $appState.headphoneMotionDetector.connected).frame(minWidth: 120)
                 }
 
                 OSCSenderView(oscSender: $appState.oscSender, isValid: $appState.oscSender.protocolValid).frame(width: 400)
             }
         }
-        .onChange(of: appState.quaternion) { _, newRotation in
-            let quaternion = newRotation.toAmbisonicCoordinateSystem()
-            let taitBryan = quaternion.toTaitBryan()
-
-            yaw = taitBryan.yaw
-            pitch = taitBryan.pitch
-            roll = taitBryan.roll
-        }
         .onDisappear {
             // I don't think that's the right place to store the settings, but it works for now.
             appState.oscSender.storeSettings()
         }
+        .padding()
+        .background(Color(hex: 0x191919))
     }
 }
 
 #Preview {
-    ContentView(connected: .constant(false)).environmentObject(AppState())
+    ContentView().environmentObject(AppState())
 }
 
 struct AccessInfo: View {
@@ -110,7 +68,7 @@ struct AccessInfo: View {
                 Text("Open Settings")
                     .fontWeight(.bold)
             }
-        }.padding().background(.red.opacity(0.2)).cornerRadius(5)
+        }.padding().background(.red.opacity(0.2)).cornerRadius(5).frame(maxWidth: 400).padding()
     }
 }
 
@@ -139,5 +97,17 @@ struct PressedReleaseButton: View {
                     self.pressing = false
                     onRelease()
                 })
+    }
+}
+
+extension Color {
+    init(hex: UInt32, alpha: Double = 1.0) {
+        self.init(
+            .sRGB,
+            red: Double((hex & 0xFF0000) >> 16) / 255.0,
+            green: Double((hex & 0x00FF00) >> 8) / 255.0,
+            blue: Double(hex & 0x0000FF) / 255.0,
+            opacity: alpha
+        )
     }
 }
