@@ -9,15 +9,15 @@ import CoreMotion
 import Foundation
 import SceneKit
 
-class HeadScene: SCNScene {
+class HeadScene: SCNScene, ObservableObject {
     private let headGroup = SCNNode()
     private let mirror = SCNNode()
 
     var mirrored = false
 
-    func setQuaternion(q: CMQuaternion) {
-        headGroup.rotation.w = q.angle
-        let axis = q.axis
+    func setQuaternion(_ quaternion: CMQuaternion) {
+        headGroup.rotation.w = quaternion.angle
+        let axis = quaternion.axis
         headGroup.rotation.x = axis.x
         headGroup.rotation.y = axis.z
         headGroup.rotation.z = -axis.y

@@ -21,7 +21,7 @@ struct CalibrationStorageType: Codable {
     var idleZ: Double
 }
 
-class Calibration {
+class Calibration: ObservableObject {
     @AppStorage("calibration") var calibrationStore: Data = .init()
 
     private var data: CMDeviceMotion = .init()

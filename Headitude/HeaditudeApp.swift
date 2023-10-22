@@ -10,25 +10,26 @@ import CoreMotion
 import SwiftUI
 
 class AppState: ObservableObject {
+    /** Raw quaternion from sensor. */
+    @Published var rawQuaternion = CMQuaternion()
+
+    /** Corrected quaternion using calibration. */
     @Published var quaternion = CMQuaternion()
-    @Published var correctedQuaternion = CMQuaternion()
-    @Published var scene = HeadScene()
 
     @AppStorage("AppState.calibration") private var calibration: Data = .init()
 
     private var accessCheckTimer = Timer()
     @Published var accessAuthorized = HeadphoneMotionDetector.isAuthorized()
 
-    var headphoneMotionDetector = HeadphoneMotionDetector(updateInterval: 0.02)
+    var headphoneMotionDetector = HeadphoneMotionDetector()
     var oscSender = OSCSender()
 
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
-            quaternion = self.headphoneMotionDetector.data.attitude.quaternion
-            correctedQuaternion = self.headphoneMotionDetector.correctedQuaternion
-            scene.setQuaternion(q: self.correctedQuaternion)
+            rawQuaternion = self.headphoneMotionDetector.data.attitude.quaternion
+            quaternion = self.headphoneMotionDetector.correctedQuaternion
 
-            oscSender.setQuaternion(q: correctedQuaternion)
+            oscSender.setQuaternion(q: quaternion)
         }
 
         headphoneMotionDetector.start()
@@ -55,7 +56,7 @@ struct HeaditudeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView().fixedSize().environmentObject(appState).preferredColorScheme(.dark)
+            ContentView().environmentObject(appState).fixedSize().preferredColorScheme(.dark)
         }.windowResizability(.contentSize)
     }
 }
@@ -63,9 +64,7 @@ struct HeaditudeApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_: Notification) {}
 
-    func applicationWillTerminate(_: Notification) {
-        // userDefaults.set(appState.calibration, forKey: "SavedAppStateKey")
-    }
+    func applicationWillTerminate(_: Notification) {}
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         return true

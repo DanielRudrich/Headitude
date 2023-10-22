@@ -10,7 +10,7 @@ import SceneKit
 import SwiftUI
 
 struct RotationViewer: NSViewRepresentable {
-    @Binding var scene: HeadScene
+    var scene: HeadScene
 
     func makeNSView(context _: Context) -> SCNView {
         // set up scene
@@ -31,15 +31,19 @@ struct RotationViewer: NSViewRepresentable {
 struct RotationViewerGroup: View {
     @EnvironmentObject private var appState: AppState
 
+    @StateObject private var scene = HeadScene()
     @State private var mirrored = true
+
     var body: some View {
         VStack(spacing: 0) {
-            RotationViewer(scene: $appState.scene).frame(width: 180, height: 120)
+            RotationViewer(scene: scene).frame(width: 180, height: 120)
                 .shadow(color: .black, radius: 20)
+                .onChange(of: appState.quaternion) { _, quaternion in scene.setQuaternion(quaternion) }
+
             Text(mirrored ? "Mirrored" : "Normal view").font(.footnote).foregroundColor(.gray)
             Button("Toggle View") {
-                appState.scene.toggleMirrored()
-                self.mirrored = appState.scene.mirrored
+                scene.toggleMirrored()
+                self.mirrored = scene.mirrored
             }
         }
     }

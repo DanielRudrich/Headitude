@@ -11,22 +11,14 @@ import Foundation
 import SwiftUI
 
 class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionManagerDelegate {
-    private let headphoneMotionManager = CMHeadphoneMotionManager()
-    private var timer = Timer()
-    private var updateInterval: TimeInterval
-
-    // raw orientation data
     @Published var data: CMDeviceMotion = .init()
-
-    // corrected quaternion
     @Published var correctedQuaternion: CMQuaternion = .init()
-
     @Published var connected: Bool = false
 
-    var calibration = Calibration()
+    private let headphoneMotionManager = CMHeadphoneMotionManager()
+    let calibration = Calibration()
 
-    init(updateInterval: TimeInterval) {
-        self.updateInterval = updateInterval
+    override init() {
         super.init()
 
         headphoneMotionManager.delegate = self
@@ -47,45 +39,28 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
         if headphoneMotionManager.isDeviceMotionAvailable {
             if !headphoneMotionManager.isDeviceMotionActive {
                 // Request access to motion data
-                headphoneMotionManager.startDeviceMotionUpdates()
+                headphoneMotionManager.startDeviceMotionUpdates(to: .main) { motionData, error in
+                    guard error == nil else {
+                        print(error!)
+                        return
+                    }
 
-                // Check for access
-                if CMHeadphoneMotionManager.authorizationStatus() == CMAuthorizationStatus.authorized {
-                    // You have access to motion data
-                    print("Motion data is available.")
-                } else {
-                    // User denied access, provide instructions to grant access manually
-                    print("Motion data access not given.")
+                    // -- update the data
+                    if let motionData = motionData {
+                        self.data = motionData
+                        self.calibration.update(data: motionData)
+                        self.correctedQuaternion = self.calibration.apply(to: motionData.attitude.quaternion)
+                        self.onUpdate()
+                    }
                 }
             }
         } else {
-            // Motion data is not available on this device
             print("Motion data is not available on this device.")
-        }
-
-        if headphoneMotionManager.isDeviceMotionAvailable {
-            headphoneMotionManager.startDeviceMotionUpdates()
-
-            timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { _ in
-                self.updateMotionData()
-            }
-        } else {
-            print("Device motion not available")
-        }
-    }
-
-    func updateMotionData() {
-        if let data = headphoneMotionManager.deviceMotion {
-            self.data = data
-            calibration.update(data: data)
-            correctedQuaternion = calibration.apply(to: data.attitude.quaternion)
-            onUpdate()
         }
     }
 
     func stop() {
         headphoneMotionManager.stopDeviceMotionUpdates()
-        timer.invalidate()
     }
 
     deinit {

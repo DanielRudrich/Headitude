@@ -1,15 +1,13 @@
 import SwiftUI
 
-struct ConnectionCalibrationView: View {
+struct ConnectionView: View {
     @EnvironmentObject private var appState: AppState
 
-    @State private var yaw = 0.0
-    @State private var pitch = 0.0
-    @State private var roll = 0.0
-    @Binding var connected: Bool
+    @State private var yawInDegrees = 0.0
+    @State private var pitchInDegrees = 0.0
+    @State private var rollInDegrees = 0.0
 
-    @State private var calibration = Calibration()
-
+    @State private var connected = true
     var body: some View {
         VStack {
             Text(connected ? "Connected" : "Not Connected")
@@ -19,18 +17,38 @@ struct ConnectionCalibrationView: View {
 
             HStack {
                 Text("Yaw:").foregroundColor(.gray)
-                Text(String(format: "%.2f", yaw)).foregroundColor(.gray)
+                Text(String(format: "%.1f°", yawInDegrees)).foregroundColor(.gray).frame(width: 50)
             }
 
             HStack {
                 Text("Pitch:").foregroundColor(.gray)
-                Text(String(format: "%.2f", pitch)).foregroundColor(.gray)
+                Text(String(format: "%.1f°", pitchInDegrees)).foregroundColor(.gray).frame(width: 50)
             }
 
             HStack {
                 Text("Roll:").foregroundColor(.gray)
-                Text(String(format: "%.2f", roll)).foregroundColor(.gray)
+                Text(String(format: "%.1f°", rollInDegrees)).foregroundColor(.gray).frame(width: 50)
             }
+        }
+        .onReceive(
+            appState.$quaternion.throttle(for: 0.05, scheduler: RunLoop.main, latest: true)
+        ) { newRotation in
+            let quaternion = newRotation.toAmbisonicCoordinateSystem()
+            let taitBryan = quaternion.toTaitBryan()
+
+            yawInDegrees = rad2deg(taitBryan.yaw)
+            pitchInDegrees = rad2deg(taitBryan.pitch)
+            rollInDegrees = rad2deg(taitBryan.roll)
+        }
+    }
+}
+
+struct ConnectionCalibrationView: View {
+    @EnvironmentObject private var appState: AppState
+
+    var body: some View {
+        VStack {
+            ConnectionView()
 
             Button(action: {
                 appState.headphoneMotionDetector.calibration.resetOrientation()
@@ -43,13 +61,33 @@ struct ConnectionCalibrationView: View {
                 .font(.footnote)
                 .foregroundColor(.gray)
         }
-        .onChange(of: appState.quaternion) { _, newRotation in
-            let quaternion = newRotation.toAmbisonicCoordinateSystem()
-            let taitBryan = quaternion.toTaitBryan()
+    }
+}
 
-            yaw = taitBryan.yaw
-            pitch = taitBryan.pitch
-            roll = taitBryan.roll
-        }
+struct PressedReleaseButton: View {
+    @GestureState private var pressed = false
+    @State private var pressing = false
+
+    let buttonText: String
+    var onDown: () -> Void
+    var onRelease: () -> Void
+
+    var body: some View {
+        Text(buttonText)
+            .padding(4)
+            .background(self.pressing ? Color.red : Color.blue)
+            .cornerRadius(6)
+
+            .gesture(DragGesture(minimumDistance: 0.0)
+                .onChanged { _ in
+                    if !self.pressing {
+                        self.pressing = true
+                        onDown()
+                    }
+                }
+                .onEnded { _ in
+                    self.pressing = false
+                    onRelease()
+                })
     }
 }

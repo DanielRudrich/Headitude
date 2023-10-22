@@ -65,40 +65,56 @@ class OSCSender {
                 part = String(part.dropFirst())
             }
 
-            var value: Float = 0.0
+            var value = 0.0
 
             switch part {
             case "yaw":
-                value = Float(taitBryan.yaw * 180 / Double.pi)
+                value = rad2deg(taitBryan.yaw)
             case "yaw+":
-                value = Float(taitBryan.yaw * 180 / Double.pi)
+                value = rad2deg(taitBryan.yaw)
                 if value < 0 { value += 360 }
             case "pitch":
-                value = Float(taitBryan.pitch * 180 / Double.pi)
+                value = rad2deg(taitBryan.pitch)
             case "pitch+":
-                value = Float(taitBryan.pitch * 180 / Double.pi)
+                value = rad2deg(taitBryan.pitch)
                 if value < 0 { value += 360 }
             case "roll":
-                value = Float(taitBryan.roll * 180 / Double.pi)
+                value = rad2deg(taitBryan.roll)
             case "roll+":
-                value = Float(taitBryan.roll * 180 / Double.pi)
+                value = rad2deg(taitBryan.roll)
                 if value < 0 { value += 360 }
 
+            case "yawRad":
+                value = taitBryan.yaw
+            case "yawRad+":
+                value = taitBryan.yaw
+                if value < 0 { value += 2 * .pi }
+            case "pitchRad":
+                value = taitBryan.pitch
+            case "pitchRad+":
+                value = taitBryan.pitch
+                if value < 0 { value += 2 * .pi }
+            case "rollRad":
+                value = taitBryan.roll
+            case "rollRad+":
+                value = taitBryan.roll
+                if value < 0 { value += 2 * .pi }
+
             case "qw":
-                value = Float(quaternion.w)
+                value = quaternion.w
             case "qx":
-                value = Float(quaternion.x)
+                value = quaternion.x
             case "qy":
-                value = Float(quaternion.y)
+                value = quaternion.y
             case "qz":
-                value = Float(quaternion.z)
+                value = quaternion.z
 
             default:
                 protocolValid = false
                 return
             }
 
-            values.append(factor * value)
+            values.append(factor * Float(value))
         }
 
         protocolValid = true

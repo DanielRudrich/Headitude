@@ -10,6 +10,7 @@
 		F155B1032AD48A6900795E77 /* AccelerationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F155B1022AD48A6900795E77 /* AccelerationExtension.swift */; };
 		F155B1052AD8754400795E77 /* Calibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F155B1042AD8754400795E77 /* Calibration.swift */; };
 		F1758B1D2AE3F62A0048E80A /* ConnectionCalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */; };
+		F1758B202AE559000048E80A /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1758B1F2AE559000048E80A /* Utilities.swift */; };
 		F1A92ED22AD08D0B001C2315 /* HeaditudeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */; };
 		F1A92ED42AD08D0B001C2315 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A92ED32AD08D0B001C2315 /* ContentView.swift */; };
 		F1A92ED62AD08D0C001C2315 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1A92ED52AD08D0C001C2315 /* Assets.xcassets */; };
@@ -28,6 +29,7 @@
 		F155B1022AD48A6900795E77 /* AccelerationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccelerationExtension.swift; sourceTree = "<group>"; };
 		F155B1042AD8754400795E77 /* Calibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Calibration.swift; sourceTree = "<group>"; };
 		F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionCalibrationView.swift; sourceTree = "<group>"; };
+		F1758B1F2AE559000048E80A /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		F1A92ECE2AD08D0B001C2315 /* Headitude.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Headitude.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaditudeApp.swift; sourceTree = "<group>"; };
 		F1A92ED32AD08D0B001C2315 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -56,6 +58,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F1758B1E2AE558F20048E80A /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				F1A92EEE2AD1A5AA001C2315 /* QuaternionExtension.swift */,
+				F155B1022AD48A6900795E77 /* AccelerationExtension.swift */,
+				F1758B1F2AE559000048E80A /* Utilities.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		F1A92EC52AD08D0B001C2315 = {
 			isa = PBXGroup;
 			children = (
@@ -76,14 +88,13 @@
 		F1A92ED02AD08D0B001C2315 /* Headitude */ = {
 			isa = PBXGroup;
 			children = (
-				F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */,
 				F1A92ED12AD08D0B001C2315 /* HeaditudeApp.swift */,
+				F1A92ED32AD08D0B001C2315 /* ContentView.swift */,
+				F1758B1E2AE558F20048E80A /* Utilities */,
+				F1758B1C2AE3F62A0048E80A /* ConnectionCalibrationView.swift */,
 				F1A92EF22AD2B644001C2315 /* HeadScene.swift */,
 				F1A92EE02AD08FB6001C2315 /* HeadphoneMotionDetector.swift */,
-				F1A92ED32AD08D0B001C2315 /* ContentView.swift */,
 				F1A92EF02AD2A6C4001C2315 /* OSCSender.swift */,
-				F1A92EEE2AD1A5AA001C2315 /* QuaternionExtension.swift */,
-				F155B1022AD48A6900795E77 /* AccelerationExtension.swift */,
 				F1A92EEC2AD18E39001C2315 /* RotationViewer.swift */,
 				F1A92ED52AD08D0C001C2315 /* Assets.xcassets */,
 				F1A92EDA2AD08D0C001C2315 /* Headitude.entitlements */,
@@ -188,6 +199,7 @@
 			files = (
 				F1A92EEF2AD1A5AA001C2315 /* QuaternionExtension.swift in Sources */,
 				F1758B1D2AE3F62A0048E80A /* ConnectionCalibrationView.swift in Sources */,
+				F1758B202AE559000048E80A /* Utilities.swift in Sources */,
 				F1A92ED42AD08D0B001C2315 /* ContentView.swift in Sources */,
 				F1A92EF12AD2A6C4001C2315 /* OSCSender.swift in Sources */,
 				F1A92EF32AD2B644001C2315 /* HeadScene.swift in Sources */,
@@ -348,6 +360,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.danielrudrich.Headitude;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -381,6 +394,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.danielrudrich.Headitude;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = YES;
 				SUPPORTED_PLATFORMS = macosx;
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
