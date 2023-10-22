@@ -10,9 +10,6 @@ import CoreMotion
 import SwiftUI
 
 class AppState: ObservableObject {
-    /** Raw quaternion from sensor. */
-    @Published var rawQuaternion = CMQuaternion()
-
     /** Corrected quaternion using calibration. */
     @Published var quaternion = CMQuaternion()
 
@@ -26,9 +23,7 @@ class AppState: ObservableObject {
 
     init() {
         headphoneMotionDetector.onUpdate = { [self] in
-            rawQuaternion = self.headphoneMotionDetector.data.attitude.quaternion
             quaternion = self.headphoneMotionDetector.correctedQuaternion
-
             oscSender.setQuaternion(q: quaternion)
         }
 
@@ -56,7 +51,7 @@ struct HeaditudeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(appState).fixedSize().preferredColorScheme(.dark)
+            ContentView(appState: appState, accessAuthorized: $appState.accessAuthorized).fixedSize().preferredColorScheme(.dark)
         }.windowResizability(.contentSize)
     }
 }

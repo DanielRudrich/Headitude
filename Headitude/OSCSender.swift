@@ -15,7 +15,7 @@ struct OSCStorageType: Codable {
     var oscProtocol: String
 }
 
-class OSCSender {
+class OSCSender: ObservableObject {
     private var client = OSCClient()
 
     private var quaternion: CMQuaternion = .init()
@@ -110,14 +110,14 @@ class OSCSender {
                 value = quaternion.z
 
             default:
-                protocolValid = false
+                if protocolValid { protocolValid = false }
                 return
             }
 
             values.append(factor * Float(value))
         }
 
-        protocolValid = true
+        if !protocolValid { protocolValid = true }
 
         let msg = OSCMessage(address, values: values)
         do {
@@ -129,12 +129,10 @@ class OSCSender {
 }
 
 struct OSCSenderView: View {
-    @Binding var oscSender: OSCSender
-
-    @Binding var isValid: Bool
-
     @State private var isIPPopoverVisible = false
     @State private var isMessagePopoverVisible = false
+
+    @ObservedObject var oscSender: OSCSender
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -151,7 +149,7 @@ struct OSCSenderView: View {
                         Image(systemName: "info.circle")
                             .foregroundColor(.blue)
                     }
-                    .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to make the button look like an icon
+                    .buttonStyle(PlainButtonStyle())
                     .popover(isPresented: $isIPPopoverVisible, arrowEdge: .bottom) {
                         VStack {
                             Text("The IP-address or hostname of the OSC destination.")
@@ -182,7 +180,7 @@ struct OSCSenderView: View {
                     Image(systemName: "info.circle")
                         .foregroundColor(.blue)
                 }
-                .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to make the button look like an icon
+                .buttonStyle(PlainButtonStyle())
                 .popover(isPresented: $isMessagePopoverVisible, arrowEdge: .bottom) {
                     VStack {
                         Text("The OSC Message pattern, starting with an address and then space-delimited tokens.")
@@ -192,7 +190,7 @@ struct OSCSenderView: View {
 
                 TextField("e.g., http://", text: $oscSender.oscProtocol)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .background(isValid ? Color.clear : Color.red)
+                    .background(oscSender.protocolValid ? Color.clear : Color.red)
                     .cornerRadius(4)
             }
         }
@@ -200,6 +198,10 @@ struct OSCSenderView: View {
         .background(Color(hex: 0x252525)).cornerRadius(8)
         .padding()
         .shadow(radius: 10)
+        .onDisappear {
+            // I don't think that's the right place to store the settings, but it works for now.
+            oscSender.storeSettings()
+        }
     }
 }
 
@@ -226,5 +228,5 @@ struct InfoButton: View {
 }
 
 #Preview {
-    OSCSenderView(oscSender: .constant(OSCSender()), isValid: .constant(true)).frame(width: 400)
+    OSCSenderView(oscSender: OSCSender()).frame(width: 400)
 }

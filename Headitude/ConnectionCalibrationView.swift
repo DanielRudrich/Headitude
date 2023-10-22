@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConnectionView: View {
-    @EnvironmentObject private var appState: AppState
+    var appState: AppState
 
     @State private var yawInDegrees = 0.0
     @State private var pitchInDegrees = 0.0
@@ -30,8 +30,11 @@ struct ConnectionView: View {
                 Text(String(format: "%.1f°", rollInDegrees)).foregroundColor(.gray).frame(width: 50)
             }
         }
+        .onReceive(appState.headphoneMotionDetector.$connected) {
+            newState in connected = newState
+        }
         .onReceive(
-            appState.$quaternion.throttle(for: 0.05, scheduler: RunLoop.main, latest: true)
+            appState.$quaternion.throttle(for: 0.10, scheduler: RunLoop.main, latest: true)
         ) { newRotation in
             let quaternion = newRotation.toAmbisonicCoordinateSystem()
             let taitBryan = quaternion.toTaitBryan()
@@ -44,11 +47,11 @@ struct ConnectionView: View {
 }
 
 struct ConnectionCalibrationView: View {
-    @EnvironmentObject private var appState: AppState
+    var appState: AppState
 
     var body: some View {
         VStack {
-            ConnectionView()
+            ConnectionView(appState: appState)
 
             Button(action: {
                 appState.headphoneMotionDetector.calibration.resetOrientation()

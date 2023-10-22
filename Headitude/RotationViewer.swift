@@ -29,7 +29,7 @@ struct RotationViewer: NSViewRepresentable {
 }
 
 struct RotationViewerGroup: View {
-    @EnvironmentObject private var appState: AppState
+    var appState: AppState
 
     @StateObject private var scene = HeadScene()
     @State private var mirrored = true
@@ -38,6 +38,9 @@ struct RotationViewerGroup: View {
         VStack(spacing: 0) {
             RotationViewer(scene: scene).frame(width: 180, height: 120)
                 .shadow(color: .black, radius: 20)
+                .onReceive(appState.$quaternion) {
+                    quaternion in scene.setQuaternion(quaternion)
+                }
                 .onChange(of: appState.quaternion) { _, quaternion in scene.setQuaternion(quaternion) }
 
             Text(mirrored ? "Mirrored" : "Normal view").font(.footnote).foregroundColor(.gray)

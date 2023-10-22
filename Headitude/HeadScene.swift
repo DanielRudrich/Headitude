@@ -167,7 +167,7 @@ class HeadScene: SCNScene, ObservableObject {
         // set up camera
         let cameraNode = SCNNode()
         cameraNode.camera = SCNCamera()
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 3) // Adjust camera position
+        cameraNode.position = SCNVector3(x: 0, y: 0, z: 3)
         rootNode.addChildNode(cameraNode)
 
         // Set camera to look at the origin

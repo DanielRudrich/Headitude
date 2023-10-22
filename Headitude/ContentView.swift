@@ -11,7 +11,9 @@ import OSCKit
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var appState: AppState
+    var appState: AppState
+
+    @Binding var accessAuthorized: Bool
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -24,20 +26,16 @@ struct ContentView: View {
                     .foregroundColor(.white)
             }
 
-            if !appState.accessAuthorized {
+            if !accessAuthorized {
                 AccessInfo().padding()
             } else {
                 HStack {
-                    RotationViewerGroup().frame(width: 200)
-                    ConnectionCalibrationView().frame(minWidth: 120)
+                    RotationViewerGroup(appState: appState).frame(width: 200)
+                    ConnectionCalibrationView(appState: appState).frame(minWidth: 120)
                 }
 
-                OSCSenderView(oscSender: $appState.oscSender, isValid: $appState.oscSender.protocolValid).frame(width: 400)
+                OSCSenderView(oscSender: appState.oscSender).frame(width: 400)
             }
-        }
-        .onDisappear {
-            // I don't think that's the right place to store the settings, but it works for now.
-            appState.oscSender.storeSettings()
         }
         .padding()
         .background(Color(hex: 0x191919))
@@ -45,7 +43,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView().environmentObject(AppState())
+    ContentView(appState: AppState(), accessAuthorized: .constant(true))
 }
 
 struct AccessInfo: View {
@@ -68,17 +66,5 @@ struct AccessInfo: View {
                     .fontWeight(.bold)
             }
         }.padding().background(.red.opacity(0.2)).cornerRadius(5).frame(maxWidth: 400).padding()
-    }
-}
-
-extension Color {
-    init(hex: UInt32, alpha: Double = 1.0) {
-        self.init(
-            .sRGB,
-            red: Double((hex & 0xFF0000) >> 16) / 255.0,
-            green: Double((hex & 0x00FF00) >> 8) / 255.0,
-            blue: Double(hex & 0x0000FF) / 255.0,
-            opacity: alpha
-        )
     }
 }

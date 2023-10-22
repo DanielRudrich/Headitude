@@ -38,14 +38,12 @@ class HeadphoneMotionDetector: NSObject, ObservableObject, CMHeadphoneMotionMana
     func start() {
         if headphoneMotionManager.isDeviceMotionAvailable {
             if !headphoneMotionManager.isDeviceMotionActive {
-                // Request access to motion data
                 headphoneMotionManager.startDeviceMotionUpdates(to: .main) { motionData, error in
                     guard error == nil else {
                         print(error!)
                         return
                     }
 
-                    // -- update the data
                     if let motionData = motionData {
                         self.data = motionData
                         self.calibration.update(data: motionData)
