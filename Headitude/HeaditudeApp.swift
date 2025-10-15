@@ -12,6 +12,7 @@ import SwiftUI
 class AppState: ObservableObject {
     /** Corrected quaternion using calibration. */
     @Published var quaternion = CMQuaternion()
+    @Published var acceleration = CMAcceleration()
 
     @AppStorage("AppState.calibration") private var calibration: Data = .init()
 
@@ -25,6 +26,9 @@ class AppState: ObservableObject {
         headphoneMotionDetector.onUpdate = { [self] in
             quaternion = self.headphoneMotionDetector.correctedQuaternion
             oscSender.setQuaternion(q: quaternion)
+            
+            acceleration = self.headphoneMotionDetector.userAcceleration;
+            oscSender.setAcceleration(a: acceleration)
         }
 
         headphoneMotionDetector.start()

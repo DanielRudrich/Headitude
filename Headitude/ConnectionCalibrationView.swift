@@ -1,4 +1,5 @@
 import SwiftUI
+import CoreMotion
 
 struct ConnectionView: View {
     var appState: AppState
@@ -6,6 +7,8 @@ struct ConnectionView: View {
     @State private var yawInDegrees = 0.0
     @State private var pitchInDegrees = 0.0
     @State private var rollInDegrees = 0.0
+    
+    @State private var acceleration: CMAcceleration = .init();
 
     @State private var connected = true
     var body: some View {
@@ -29,6 +32,18 @@ struct ConnectionView: View {
                 Text("Roll:").foregroundColor(.gray)
                 Text(String(format: "%.1f°", rollInDegrees)).foregroundColor(.gray).frame(width: 50)
             }
+            HStack {
+                Text("Acc X:").foregroundColor(.gray)
+                Text(String(format: "%.2f G", acceleration.x)).foregroundColor(.gray).frame(width: 50)
+            }
+            HStack {
+                Text("Acc Y:").foregroundColor(.gray)
+                Text(String(format: "%.2f G", acceleration.y)).foregroundColor(.gray).frame(width: 50)
+            }
+            HStack {
+                Text("Acc Z:").foregroundColor(.gray)
+                Text(String(format: "%.2f G", acceleration.z)).foregroundColor(.gray).frame(width: 50)
+            }
         }
         .onReceive(appState.headphoneMotionDetector.$connected) {
             newState in connected = newState
@@ -42,6 +57,11 @@ struct ConnectionView: View {
             yawInDegrees = rad2deg(taitBryan.yaw)
             pitchInDegrees = rad2deg(taitBryan.pitch)
             rollInDegrees = rad2deg(taitBryan.roll)
+        }
+        .onReceive(
+            appState.$acceleration.throttle(for: 0.10, scheduler: RunLoop.main, latest: true)
+        ) { newAcceleration in
+            acceleration = newAcceleration
         }
     }
 }

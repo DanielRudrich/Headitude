@@ -19,6 +19,7 @@ class OSCSender: ObservableObject {
     private var client = OSCClient()
 
     private var quaternion: CMQuaternion = .init()
+    private var acceleration: CMAcceleration = .init();
 
     @AppStorage("oscSettings") var oscSettingsStore: Data = .init()
 
@@ -42,6 +43,10 @@ class OSCSender: ObservableObject {
         let oscSettingsData = OSCStorageType(ip: ip, port: port, oscProtocol: oscProtocol)
         guard let data = try? JSONEncoder().encode(oscSettingsData) else { return }
         oscSettingsStore = data
+    }
+    
+    func setAcceleration(a: CMAcceleration) {
+        acceleration = a;
     }
 
     func setQuaternion(q: CMQuaternion) {
@@ -108,6 +113,13 @@ class OSCSender: ObservableObject {
                 value = quaternion.y
             case "qz":
                 value = quaternion.z
+            
+            case "accx":
+                value = acceleration.x
+            case "accy":
+                value = acceleration.y
+            case "accz":
+                value = acceleration.z
 
             default:
                 if protocolValid { protocolValid = false }

@@ -63,5 +63,11 @@ Currently the following tokens are supported:
 - `qx` Quaternion x
 - `qy` Quaternion y
 - `qz` Quaternion z
+-
+- `accX` Acceleration in x axis in G
+- `accY` Acceleration in y axis in G
+- `accZ` Acceleration in z axis in G
+
+A G is a unit of gravitation force equal to that exerted by the earth’s gravitational field (9.81 m s−2).
 
 **Note**: You can prepend a token with a `-` to flip the sign, e.g. `-yaw` or `-yawRad`.
