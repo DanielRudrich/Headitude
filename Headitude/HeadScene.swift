@@ -18,9 +18,9 @@ class HeadScene: SCNScene, ObservableObject {
     func setQuaternion(_ quaternion: CMQuaternion) {
         headGroup.rotation.w = quaternion.angle
         let axis = quaternion.axis
-        headGroup.rotation.x = axis.x
+        headGroup.rotation.x = -axis.x
         headGroup.rotation.y = axis.z
-        headGroup.rotation.z = -axis.y
+        headGroup.rotation.z = axis.y
     }
 
     func toggleMirrored() {
